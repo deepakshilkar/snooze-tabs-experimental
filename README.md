@@ -1,3 +1,5 @@
+# This is a fork of the original repo and I am trying to incorporate some of the featyures from Snoozze. 
+
 # Tab Snoozer
 
 Tab Snoozer is a Chrome extension that helps you manage your browser tabs by allowing you to "snooze" them for a set period. Once snoozed, the tab will close and reopen automatically at the specified time.
