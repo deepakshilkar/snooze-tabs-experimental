@@ -1,4 +1,4 @@
-# This is a fork of the original repo and I am trying to incorporate some of the featyures from Snoozze. 
+# This is a fork and I am trying to incorporate some of the featyures from Snoozze. 
 
 # Tab Snoozer
 
