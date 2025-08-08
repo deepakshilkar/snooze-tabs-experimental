@@ -1,26 +1,27 @@
 {
-    "manifest_version": 3,
-    "description": "Easily snooze tabs with a click! Set timers to hide distracting tabs and automatically bring them back when you need them again.",
-    "name": "Tab Snoozer - Snooze tabs in a click",
-    "short_name": "Tab Snoozer",
-    "author": "Rusty",
-    "version": "1.0.2",
-    "permissions": ["storage", "activeTab", "alarms"],
-    "background": {
-      "service_worker": "sw.js"
-    },
-    "action": {
-      "default_popup": "popup.html",
-      "default_icon": {
-        "16": "icon.png",
-        "48": "icon.png",
-        "128": "icon.png"
-      }
-    },
-    "icons": {
+  "manifest_version": 3,
+  "name": "Tab Snoozer - Snooze tabs in a click",
+  "short_name": "Tab Snoozer",
+  "description": "Easily snooze tabs with a click! Set timers to hide distracting tabs and automatically bring them back when you need them again.",
+  "author": "Rusty",
+  "version": "1.0.2",
+  "minimum_chrome_version": "116",
+  "permissions": ["storage", "activeTab", "alarms", "tabs"],
+  "background": {
+    "service_worker": "sw.js"
+  },
+  "action": {
+    "default_title": "Snooze this tab",
+    "default_popup": "popup.html",
+    "default_icon": {
       "16": "icon.png",
       "48": "icon.png",
       "128": "icon.png"
     }
+  },
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
   }
-  
+}

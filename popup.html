@@ -1,431 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tab Snoozer</title>
-  <style>
-    :root {
-      --primary: #6200ee;
-      --primary-hover: #3700b3;
-      --secondary: #03dac6;
-      --secondary-hover: #018786;
-      --background: #fafafa;
-      --surface: #ffffff;
-      --text: #1a1a1a;
-      --error: #b00020;
-      --error-hover: #9c000e;
-      --divider: rgba(0, 0, 0, 0.12);
-      --shadow: rgba(0, 0, 0, 0.2);
-    }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Snooze Tab</title>
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      margin: 0;
-      padding: 16px;
-      width: 400px;
-      background-color: var(--background);
-      color: var(--text);
-    }
-
-    h3 {
-      font-size: 18px;
-      margin: 0 0 16px 0;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--divider);
-    }
-
-    .snooze-grid {
-      display: grid;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-
-    button {
-      position: relative;
-      overflow: hidden;
-      padding: 12px;
-      width: 100%;
-      background-color: var(--primary);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
-      font-size: 14px;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 4px var(--shadow);
-    }
-
-    button:hover {
-      background-color: var(--primary-hover);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 8px var(--shadow);
-    }
-
-    button:active {
-      transform: translateY(0);
-      box-shadow: 0 2px 4px var(--shadow);
-    }
-
-    .ripple {
-      position: absolute;
-      border-radius: 50%;
-      transform: scale(0);
-      background-color: rgba(255, 255, 255, 0.3);
-      animation: ripple 600ms linear;
-      pointer-events: none;
-    }
-
-    @keyframes ripple {
-      to {
-        transform: scale(4);
-        opacity: 0;
-      }
-    }
-
-    #snooze-list {
-      margin-top: 20px;
-      border-top: 1px solid var(--divider);
-      padding-top: 16px;
-    }
-
-    .snoozed-tab {
-      background: var(--surface);
-      border-radius: 8px;
-      padding: 12px;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .snoozed-tab:last-child {
-      margin-bottom: 0;
-    }
-
-    .tab-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .tab-title {
-      font-weight: 500;
-      margin-bottom: 4px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .tab-time {
-      color: #666;
-      font-size: 12px;
-    }
-
-    .remove-btn {
-      flex-shrink: 0;
-      width: 32px;
-      height: 32px;
-      min-width: 32px;
-      padding: 0;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--error);
-      color: white;
-      font-size: 18px;
-    }
-
-    .remove-btn:hover {
-      background: var(--error-hover);
-    }
-
-    .section-title {
-      font-size: 16px;
-      font-weight: 500;
-      margin-bottom: 12px;
-    }
-
-    .custom-snooze {
-      background-color: var(--secondary);
-    }
-
-    .custom-snooze:hover {
-      background-color: var(--secondary-hover);
-    }
-
-    .empty-message {
-      color: #666;
-      text-align: center;
-      padding: 20px 0;
-    }
-
-    /* Modal styles */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      z-index: 1000;
-    }
-
-    .modal-content {
-      background-color: var(--surface);
-      margin: 15% auto;
-      padding: 20px;
-      border-radius: 12px;
-      width: 80%;
-      box-shadow: 0 4px 12px var(--shadow);
-    }
-
-    .modal h4 {
-      margin: 0 0 16px 0;
-      font-size: 16px;
-    }
-
-    .modal input[type="datetime-local"],
-    .modal input[type="time"] {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 16px;
-      border: 1px solid var(--divider);
-      border-radius: 6px;
-      font-size: 14px;
-    }
-
-    .modal-buttons {
-      display: flex;
-      gap: 8px;
-      justify-content: flex-end;
-    }
-
-    .modal-buttons button {
-      width: auto;
-      min-width: 80px;
-    }
-
-    .modal-cancel {
-      background-color: var(--surface) !important;
-      color: var(--primary) !important;
-      border: 1px solid var(--primary);
-    }
-
-    .days-selector {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 16px;
-    }
-
-    .days-selector label {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 13px;
-    }
-
-    .recurring-options {
-      margin-bottom: 16px;
-    }
-
-    .tab-buttons {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    .tab-button {
-      flex: 1;
-      padding: 8px 16px;
-      background: var(--surface);
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 500;
-      color: #666;
-      transition: all 0.2s ease;
-    }
-
-    .tab-button.active {
-      background: var(--primary);
-      color: white;
-    }
-
-    .tab-button .count {
-      display: inline-block;
-      background: rgba(0,0,0,0.1);
-      padding: 2px 6px;
-      border-radius: 10px;
-      font-size: 12px;
-      margin-left: 6px;
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 32px 16px;
-      color: #666;
-    }
-
-    .empty-state p {
-      margin: 0;
-    }
-
-    .empty-state .empty-subtitle {
-      font-size: 13px;
-      margin-top: 8px;
-      color: #999;
-    }
-
-    /* Add this for the close icon */
-    .close-icon {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      position: relative;
-    }
-
-    .close-icon::before,
-    .close-icon::after {
-      content: '';
-      position: absolute;
-      width: 16px;
-      height: 2px;
-      background-color: currentColor;
-      top: 50%;
-      left: 0;
-    }
-
-    .close-icon::before {
-      transform: rotate(45deg);
-    }
-
-    .close-icon::after {
-      transform: rotate(-45deg);
-    }
-
-    .modal-message {
-      margin: 0 0 20px 0;
-      color: #666;
-      font-size: 14px;
-      line-height: 1.4;
-    }
-
-    .modal-buttons-vertical {
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .modal-buttons-vertical button {
-      width: 100%;
-    }
-
-    .modal-remove-only {
-      background-color: var(--error) !important;
-    }
-
-    .modal-remove-only:hover {
-      background-color: var(--error-hover) !important;
-    }
-
-    .modal-remove-single {
-      background-color: var(--secondary) !important;
-    }
-
-    .modal-remove-single:hover {
-      background-color: var(--secondary-hover) !important;
-    }
-  </style>
+  <!-- Your external styles (Material-ish, overflow-safe) -->
+  <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body style="padding:16px;">
   <h3>Snooze Tab</h3>
-  
+
+  <!-- Quick actions -->
   <div class="snooze-grid">
-    <!-- Buttons will be dynamically inserted here -->
+    <!-- Buttons inserted by popup.js (getSmartSnoozeOptions) -->
   </div>
 
-  <!-- Add modal for custom date/time -->
-  <div id="customModal" class="modal">
-    <div class="modal-content">
-      <h4>Pick Date & Time</h4>
-      <input type="datetime-local" id="customDateTime">
-      <div class="modal-buttons">
-        <button class="modal-cancel">Cancel</button>
-        <button class="modal-confirm">Snooze</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Add modal for recurring snooze -->
-  <div id="recurringModal" class="modal">
-    <div class="modal-content">
-      <h4>Set Recurring Snooze</h4>
-      <div class="recurring-options">
-        <input type="time" id="recurringTime" required>
-        <div class="days-selector">
-          <label><input type="checkbox" value="1"> Mon</label>
-          <label><input type="checkbox" value="2"> Tue</label>
-          <label><input type="checkbox" value="3"> Wed</label>
-          <label><input type="checkbox" value="4"> Thu</label>
-          <label><input type="checkbox" value="5"> Fri</label>
-          <label><input type="checkbox" value="6"> Sat</label>
-          <label><input type="checkbox" value="0"> Sun</label>
-        </div>
-      </div>
-      <div class="modal-buttons">
-        <button class="modal-cancel">Cancel</button>
-        <button class="modal-confirm">Set Recurring</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Add this after the other modals -->
-  <div id="removeModal" class="modal">
-    <div class="modal-content">
-      <h4>Remove Snooze</h4>
-      <p class="modal-message">Would you like to remove the snooze and open the tab?</p>
-      <div class="modal-buttons">
-        <button class="modal-cancel">Cancel</button>
-        <button class="modal-confirm">Remove & Open</button>
-        <button class="modal-remove-only">Just Remove</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Add this for recurring remove confirmation -->
-  <div id="removeRecurringModal" class="modal">
-    <div class="modal-content">
-      <h4>Remove Recurring Snooze</h4>
-      <p class="modal-message">This is a recurring snooze. What would you like to do?</p>
-      <div class="modal-buttons modal-buttons-vertical">
-        <button class="modal-confirm">Remove All Future Occurrences & Open Tab</button>
-        <button class="modal-remove-only">Remove All Future Occurrences</button>
-        <button class="modal-remove-single">Remove Only This Occurrence</button>
-        <button class="modal-cancel">Cancel</button>
-      </div>
-    </div>
-  </div>
-
+  <!-- Snoozed list -->
   <div id="snooze-list">
     <div class="section-title">Snoozed tabs</div>
+    <!-- Content is rendered by listSnoozed() -->
   </div>
 
+  <!-- ===== Modals ===== -->
+
+  <!-- Custom date/time modal -->
+  <div id="customModal" class="modal" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="customModalTitle">
+      <h4 id="customModalTitle">Pick date &amp; time</h4>
+      <p class="modal-message">Choose when this tab should come back.</p>
+
+      <label class="field-label" for="customDateTime">Date &amp; time</label>
+      <input type="datetime-local" id="customDateTime" />
+
+      <div class="modal-buttons">
+        <button type="button" class="modal-cancel">Cancel</button>
+        <button type="button" class="modal-confirm">Snooze</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recurring snooze modal -->
+  <div id="recurringModal" class="modal" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="recurringModalTitle">
+      <h4 id="recurringModalTitle">Set recurring snooze</h4>
+      <p class="modal-message">Pick the days and time to reopen this tab automatically.</p>
+
+      <label class="field-label" for="recurringTime">Time</label>
+      <input type="time" id="recurringTime" required />
+
+      <label class="field-label">Days</label>
+      <div class="days-selector">
+        <label><input type="checkbox" value="1"> Mon</label>
+        <label><input type="checkbox" value="2"> Tue</label>
+        <label><input type="checkbox" value="3"> Wed</label>
+        <label><input type="checkbox" value="4"> Thu</label>
+        <label><input type="checkbox" value="5"> Fri</label>
+        <label><input type="checkbox" value="6"> Sat</label>
+        <label><input type="checkbox" value="0"> Sun</label>
+      </div>
+
+      <div class="modal-buttons">
+        <button type="button" class="modal-cancel">Cancel</button>
+        <button type="button" class="modal-confirm">Set Recurring</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Remove one-time snooze -->
+  <div id="removeModal" class="modal" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="removeModalTitle">
+      <h4 id="removeModalTitle">Remove Snooze</h4>
+      <p class="modal-message">Would you like to remove the snooze and open the tab?</p>
+      <div class="modal-buttons">
+        <button type="button" class="modal-cancel">Cancel</button>
+        <button type="button" class="modal-confirm">Remove &amp; Open</button>
+        <button type="button" class="modal-remove-only">Just Remove</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Remove recurring snooze -->
+  <div id="removeRecurringModal" class="modal" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="removeRecurringModalTitle">
+      <h4 id="removeRecurringModalTitle">Remove Recurring Snooze</h4>
+      <p class="modal-message">This is a recurring snooze. What would you like to do?</p>
+      <div class="modal-buttons modal-buttons-vertical">
+        <button type="button" class="modal-confirm">Remove All Future Occurrences &amp; Open Tab</button>
+        <button type="button" class="modal-remove-only">Remove All Future Occurrences</button>
+        <button type="button" class="modal-remove-single">Remove Only This Occurrence</button>
+        <button type="button" class="modal-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Behavior -->
   <script src="popup.js"></script>
 </body>
 </html>
-
