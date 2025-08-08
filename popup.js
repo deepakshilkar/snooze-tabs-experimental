@@ -280,11 +280,29 @@ async function removeSnooze(alarmName) {
           await chrome.storage.local.remove(item[alarmName].recurringId);
         }
 
-        // Then open the tab if requested
+        // Handle opening and scheduling next occurrence
         if (action === 'removeAllAndOpen' || action === 'removeSingleAndOpen') {
           await chrome.tabs.create({ url: item[alarmName].url });
+
+          if (action === 'removeSingleAndOpen') {
+            const config = (await chrome.storage.local.get(item[alarmName].recurringId))[item[alarmName].recurringId];
+            if (config) {
+              const [hours, minutes] = config.time.split(":").map(Number);
+              const nextTime = getNextOccurrence(hours, minutes, config.days);
+              const newAlarmName = `snooze-${Date.now()}-${nextTime.getTime()}`;
+              await chrome.storage.local.set({
+                [newAlarmName]: {
+                  url: item[alarmName].url,
+                  title: item[alarmName].title,
+                  snoozeTime: nextTime.getTime(),
+                  recurringId: item[alarmName].recurringId
+                }
+              });
+              chrome.alarms.create(newAlarmName, { when: nextTime.getTime() });
+            }
+          }
         }
-        
+
         listSnoozed();
         resolve();
       };
